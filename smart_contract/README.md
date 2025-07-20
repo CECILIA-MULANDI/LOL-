@@ -1,13 +1,35 @@
-# Sample Hardhat Project
+# LaughterNFT Smart Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+A Solidity smart contract for minting NFTs that represent laughs or funny content. Built with Hardhat and OpenZeppelin.
 
-Try running some of the following tasks:
+## Contract Features
+
+- **ERC721 NFT**: Standard NFT implementation with metadata storage
+- **Mint Laughs**: Users can mint NFTs with custom metadata URIs
+- **Creator Tracking**: Maps each token to its original creator
+- **Events**: Emits `LaughMinted` events for indexing
+
+## Setup
 
 ```shell
-npx hardhat help
+npm install
+```
+
+## Deployment
+
+Deploy to Base Sepolia testnet:
+
+```shell
+npx hardhat run scripts/deploy.js --network baseTestnet
+```
+
+## Contract Address
+
+Deployed on Base Sepolia: `0x13C18946c5BB24E4fFf3D6dF05dd693E1881ff55`
+
+## Usage
+
+```shell
 npx hardhat test
-REPORT_GAS=true npx hardhat test
 npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
 ```
