@@ -2,8 +2,10 @@
 pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract LaughterNFT is ERC721, ERC721URIStorage {
+contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
     uint256 private _tokenIdCounter;
 
     // who created each laugh?
@@ -14,9 +16,11 @@ contract LaughterNFT is ERC721, ERC721URIStorage {
         string tokenURI
     );
 
-    constructor() ERC721("LaughterLegends", "LAUGH") {}
+    constructor() ERC721("LaughterLegends", "LAUGH") Ownable(msg.sender) {}
 
-    function mintLaugh(string memory _tokenURI) public returns (uint256) {
+    function mintLaugh(
+        string memory _tokenURI
+    ) public payable nonReentrant returns (uint256) {
         uint256 tokenId = _tokenIdCounter;
         _tokenIdCounter++;
 
