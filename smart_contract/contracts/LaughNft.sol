@@ -112,5 +112,13 @@ contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
     ) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
+
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal override(ERC721) returns (address) {
+        return super._update(to, tokenId, auth);
+    }
 }
 //0x73c2c379B595a754073BCa937AFEA292f9ea602E
