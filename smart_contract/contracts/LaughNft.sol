@@ -89,6 +89,14 @@ contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
         emit LaughSold(tokenId, msg.sender, price);
     }
 
+    function setMintPrice(uint256 _price) public onlyOwner {
+        mintPrice = _price;
+    }
+
+    function withdraw() public onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
+
     function totalSupply() public view returns (uint256) {
         return _tokenIdCounter;
     }
