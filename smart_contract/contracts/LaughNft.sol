@@ -26,6 +26,11 @@ contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
         string title
     );
     event LaughListed(uint256 tokenPrice, uint256 price);
+    event LaughSold(
+        uint256 indexed tokenId,
+        address indexed buyer,
+        uint256 price
+    );
 
     constructor() ERC721("LaughterLegends", "LAUGH") Ownable(msg.sender) {}
 
@@ -60,6 +65,28 @@ contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
         laughs[tokenId].price = price;
         laughs[tokenId].forSale = true;
         emit LaughListed(tokenId, price);
+    }
+
+    function buyLaugh(uint256 tokenId) public payable nonReentrant {
+        require(laughs[tokenId].forSale, "Not for sale");
+        require(msg.value >= laughs[tokenId].price, "Insufficient payment!");
+        address seller = ownerOf(tokenId);
+        address creator = laughs[tokenId].creator;
+        uint256 price = laughs[tokenId].price;
+
+        //calculate the royalty
+        uint256 royalty = (price * royaltyPercentage) / 100;
+        uint256 sellerAmount = price - royalty;
+
+        _transfer(seller, msg.sender, tokenId);
+        laughs[tokenId].forSale = false;
+        laughs[tokenId].price = 0;
+        payable(seller).transfer(sellerAmount);
+        if (creator != seller) {
+            payable(creator).transfer(royalty);
+        }
+
+        emit LaughSold(tokenId, msg.sender, price);
     }
 
     function totalSupply() public view returns (uint256) {
