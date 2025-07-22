@@ -2,12 +2,23 @@
 
 import { useState } from "react";
 import Navbar from "../components/Navbar";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { abi } from "../smart-contracts/abi.json";
+import { CONTRACT_ADDRESS } from "../smart-contracts/constants";
+import { uploadToIPFS, uploadMetadataToIPFS } from "../utils/ipfs";
 
 export default function MintPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadedUri, setUploadedUri] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -16,22 +27,89 @@ export default function MintPage() {
     }
   };
 
+  const createMetadata = (fileUri: string) => {
+    return {
+      name: title,
+      description: description,
+      image: fileUri,
+      attributes: [
+        {
+          trait_type: "Type",
+          value: "Laugh NFT",
+        },
+      ],
+    };
+  };
+
   const handleMint = async () => {
     if (!title || !description || !file) {
-      alert("Please fill in all fields and upload a file");
+      setError("Please fill in all fields and upload a file");
       return;
     }
 
+    setError("");
     setIsUploading(true);
-    // TODO: Implement actual minting logic
-    console.log("Minting NFT:", { title, description, file });
 
-    // Simulate minting process
-    setTimeout(() => {
+    try {
+      // Step 1: Upload file to IPFS
+      console.log("Uploading file to IPFS...");
+      const fileUri = await uploadToIPFS(file);
+      setUploadedUri(fileUri);
+      console.log("File uploaded:", fileUri);
+
+      // Step 2: Create and upload metadata
+      console.log("Creating metadata...");
+      const metadata = createMetadata(fileUri);
+      const metadataUri = await uploadMetadataToIPFS(metadata);
+      console.log("Metadata uploaded:", metadataUri);
+
+      // Step 3: Call smart contract
+      console.log("Calling smart contract...");
+      writeContract({
+        address: CONTRACT_ADDRESS as `0x${string}`,
+        abi: abi,
+        functionName: "mintLaugh",
+        args: [metadataUri, title, description],
+        value: BigInt("100000000000000000"), // 0.1 ETH in wei
+      });
+    } catch (err) {
+      console.error("Minting error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to mint NFT. Please try again."
+      );
+    } finally {
       setIsUploading(false);
-      alert("NFT minted successfully!");
-    }, 2000);
+    }
   };
+
+  // Show success message when transaction is confirmed
+  if (isSuccess) {
+    return (
+      <div className="min-h-screen bg-cream">
+        <Navbar />
+        <main className="px-2 sm:px-8 py-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8 text-center">
+              <h1 className="text-xl sm:text-3xl font-bold text-green-600 mb-4">
+                🎉 NFT Minted Successfully!
+              </h1>
+              <p className="text-gray-600 mb-4">
+                Your laugh NFT has been minted and is now on the blockchain!
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-peach text-gray-800 rounded-lg font-semibold hover:bg-opacity-80 transition-colors"
+              >
+                Mint Another NFT
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-cream">
@@ -42,6 +120,13 @@ export default function MintPage() {
             <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
               Mint New Laugh NFT
             </h1>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+              </div>
+            )}
+
             <form className="space-y-4 sm:space-y-6">
               {/* Title Input */}
               <div>
@@ -106,17 +191,30 @@ export default function MintPage() {
               </div>
               {/* Minting Cost Info */}
               <div className="text-xs sm:text-sm text-gray-600">
-                Minting Cost: 0.05 ETH + Transaction Fees
+                Minting Cost: 0.1 ETH + Transaction Fees
               </div>
               {/* Mint Button */}
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={handleMint}
-                  disabled={isUploading || !title || !description || !file}
+                  disabled={
+                    isPending ||
+                    isConfirming ||
+                    isUploading ||
+                    !title ||
+                    !description ||
+                    !file
+                  }
                   className="px-6 sm:px-8 py-2 sm:py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
-                  {isUploading ? "Minting..." : "Mint NFT"}
+                  {isPending
+                    ? "Confirming..."
+                    : isConfirming
+                    ? "Minting..."
+                    : isUploading
+                    ? "Uploading..."
+                    : "Mint NFT"}
                 </button>
               </div>
             </form>

@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,8 +35,9 @@ export default function Navbar() {
             Profile
           </Link>
         </div>
-        {/* Right: Avatar/Notif */}
+        {/* Right: Wallet, Avatar/Notif */}
         <div className="flex items-center space-x-4">
+          <ConnectButton />
           <button className="p-2 text-gray-600 hover:text-gray-800 md:block hidden">
             🔔
           </button>

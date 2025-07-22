@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
     uint256 private _tokenIdCounter;
-    uint256 public mintPrice = 0.001 ether;
+    uint256 public mintPrice = 0.00001 ether;
     uint256 public royaltyPercentage = 5;
     struct LaughData {
         address creator;
