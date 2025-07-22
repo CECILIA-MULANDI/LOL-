@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import Navbar from "../components/Navbar";
 
 export default function MintPage() {
   const [title, setTitle] = useState("");
@@ -35,46 +35,14 @@ export default function MintPage() {
 
   return (
     <div className="min-h-screen bg-cream">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-cream">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl">😂</span>
-            <span className="text-xl font-bold text-gray-800">
-              Laugh Factory
-            </span>
-          </Link>
-
-          <div className="flex space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-800">
-              Home
-            </Link>
-            <Link href="/explore" className="text-gray-600 hover:text-gray-800">
-              Explore
-            </Link>
-            <Link href="/mint" className="text-gray-600 hover:text-gray-800">
-              Create
-            </Link>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-600 hover:text-gray-800">🔔</button>
-          <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">A</span>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="px-8 py-6">
+      <Navbar />
+      <main className="px-2 sm:px-8 py-6">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
               Mint New Laugh NFT
             </h1>
-
-            <form className="space-y-6">
+            <form className="space-y-4 sm:space-y-6">
               {/* Title Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -85,10 +53,9 @@ export default function MintPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter title"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach focus:border-transparent placeholder-peach"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach focus:border-transparent placeholder-peach text-sm sm:text-base"
                 />
               </div>
-
               {/* Description Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -99,21 +66,20 @@ export default function MintPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter description"
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach focus:border-transparent placeholder-peach resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-peach focus:border-transparent placeholder-peach resize-none text-sm sm:text-base"
                 />
               </div>
-
               {/* File Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload Laugh Content
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <div className="space-y-4">
-                    <div className="text-lg font-semibold text-gray-800">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center">
+                  <div className="space-y-2 sm:space-y-4">
+                    <div className="text-base sm:text-lg font-semibold text-gray-800">
                       Upload Laugh Content
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-xs sm:text-sm text-gray-500">
                       Drag and drop or browse to upload your laugh content
                       (audio or video).
                     </p>
@@ -126,31 +92,29 @@ export default function MintPage() {
                     />
                     <label
                       htmlFor="file-upload"
-                      className="inline-block px-6 py-3 bg-peach text-gray-800 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors"
+                      className="inline-block px-4 sm:px-6 py-2 sm:py-3 bg-peach text-gray-800 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors text-sm sm:text-base"
                     >
                       Browse Files
                     </label>
                     {file && (
-                      <p className="text-sm text-green-600">
+                      <p className="text-xs sm:text-sm text-green-600">
                         Selected: {file.name}
                       </p>
                     )}
                   </div>
                 </div>
               </div>
-
               {/* Minting Cost Info */}
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 Minting Cost: 0.05 ETH + Transaction Fees
               </div>
-
               {/* Mint Button */}
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={handleMint}
                   disabled={isUploading || !title || !description || !file}
-                  className="px-8 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 sm:px-8 py-2 sm:py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
                   {isUploading ? "Minting..." : "Mint NFT"}
                 </button>

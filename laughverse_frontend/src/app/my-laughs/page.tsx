@@ -1,8 +1,9 @@
-import Link from "next/link";
+import Navbar from "../components/Navbar";
 import NFTCard from "../components/NFTCards";
 
 const myNFTs = [
   {
+    id: "1",
     title: "My First Laugh",
     creator: "You",
     image: "😊",
@@ -10,6 +11,7 @@ const myNFTs = [
     status: "owned",
   },
   {
+    id: "2",
     title: "Weekend Chuckles",
     creator: "You",
     image: "😂",
@@ -17,6 +19,7 @@ const myNFTs = [
     status: "created",
   },
   {
+    id: "3",
     title: "Morning Giggles",
     creator: "You",
     image: "😄",
@@ -25,102 +28,44 @@ const myNFTs = [
   },
 ];
 
-const createdNFTs = [
-  {
-    title: "Weekend Chuckles",
-    creator: "You",
-    image: "😂",
-    price: "0.15",
-    status: "created",
-  },
-  {
-    title: "Coffee Laughs",
-    creator: "You",
-    image: "🤣",
-    price: "0.12",
-    status: "created",
-  },
-];
-
 export default function MyLaughsPage() {
   return (
     <div className="min-h-screen bg-cream">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-4 bg-cream">
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl">😂</span>
-            <span className="text-xl font-bold text-gray-800">
-              Laugh Factory
-            </span>
-          </Link>
-
-          <div className="flex space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-800">
-              Home
-            </Link>
-            <Link href="/explore" className="text-gray-600 hover:text-gray-800">
-              Explore
-            </Link>
-            <Link href="/mint" className="text-gray-600 hover:text-gray-800">
-              Create
-            </Link>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <button className="p-2 text-gray-600 hover:text-gray-800">🔔</button>
-          <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold">A</span>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="px-8 py-6">
+      <Navbar />
+      <main className="px-2 sm:px-8 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">My Laughs</h1>
-          <p className="text-gray-600">Manage your laugh NFT collection</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4">
+            My Laughs
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Manage your laugh NFT collection
+          </p>
         </div>
-
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <div className="text-2xl font-bold text-gray-800">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-center mb-8 max-w-md mx-auto">
+          <div className="bg-white rounded-lg py-3 sm:py-4 shadow-sm">
+            <div className="text-lg sm:text-2xl font-bold text-gray-800">
               {myNFTs.length}
             </div>
-            <div className="text-gray-600">Total Owned</div>
+            <div className="text-gray-500 text-xs sm:text-sm">Total Owned</div>
           </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <div className="text-2xl font-bold text-gray-800">
-              {createdNFTs.length}
+          <div className="bg-white rounded-lg py-3 sm:py-4 shadow-sm">
+            <div className="text-lg sm:text-2xl font-bold text-gray-800">2</div>
+            <div className="text-gray-500 text-xs sm:text-sm">Created</div>
+          </div>
+          <div className="bg-white rounded-lg py-3 sm:py-4 shadow-sm">
+            <div className="text-lg sm:text-2xl font-bold text-gray-800">
+              0.35 ETH
             </div>
-            <div className="text-gray-600">Created</div>
-          </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <div className="text-2xl font-bold text-gray-800">0.35 ETH</div>
-            <div className="text-gray-600">Total Value</div>
+            <div className="text-gray-500 text-xs sm:text-sm">Total Value</div>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex space-x-4 mb-8">
-          <button className="px-6 py-3 bg-peach text-gray-800 rounded-lg font-semibold">
-            All Laughs
-          </button>
-          <button className="px-6 py-3 bg-white text-gray-600 rounded-lg font-semibold hover:bg-gray-50">
-            Created
-          </button>
-          <button className="px-6 py-3 bg-white text-gray-600 rounded-lg font-semibold hover:bg-gray-50">
-            Favorites
-          </button>
-        </div>
-
         {/* NFT Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {myNFTs.map((nft, index) => (
             <div key={index} className="relative">
               <NFTCard
+                id={nft.id}
                 title={nft.title}
                 creator={nft.creator}
                 image={nft.image}
@@ -140,7 +85,6 @@ export default function MyLaughsPage() {
             </div>
           ))}
         </div>
-
         {/* Empty State */}
         {myNFTs.length === 0 && (
           <div className="text-center py-12">
@@ -151,13 +95,13 @@ export default function MyLaughsPage() {
             <p className="text-gray-600 mb-6">
               Start collecting or create your first laugh NFT!
             </p>
-            <Link
+            <a
               href="/mint"
               className="px-8 py-4 bg-peach text-gray-800 rounded-lg font-semibold hover:bg-opacity-80 transition-colors inline-flex items-center space-x-2"
             >
               <span>🎭</span>
               <span>Create Your First Laugh</span>
-            </Link>
+            </a>
           </div>
         )}
       </main>
