@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { abi } from "../smart-contracts/abi.json";
+import abi from "../smart-contracts/abi.json";
 import { CONTRACT_ADDRESS } from "../smart-contracts/constants";
 import { uploadToIPFS, uploadMetadataToIPFS } from "../utils/ipfs";
 
@@ -43,6 +43,7 @@ export default function MintPage() {
 
   const handleMint = async () => {
     if (!title || !description || !file) {
+      alert("Please fill in all fields and upload a file");
       setError("Please fill in all fields and upload a file");
       return;
     }
@@ -70,7 +71,7 @@ export default function MintPage() {
         abi: abi,
         functionName: "mintLaugh",
         args: [metadataUri, title, description],
-        value: BigInt("100000000000000000"), // 0.1 ETH in wei
+        value: BigInt("10000000000000"), // 0.00001 ETH in wei (matches contract)
       });
     } catch (err) {
       console.error("Minting error:", err);
@@ -191,7 +192,7 @@ export default function MintPage() {
               </div>
               {/* Minting Cost Info */}
               <div className="text-xs sm:text-sm text-gray-600">
-                Minting Cost: 0.1 ETH + Transaction Fees
+                Minting Cost: 0.00001 ETH + Transaction Fees
               </div>
               {/* Mint Button */}
               <div className="flex justify-end">
