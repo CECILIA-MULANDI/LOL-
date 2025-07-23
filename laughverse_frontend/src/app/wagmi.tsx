@@ -36,3 +36,5 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
 // Auto-commit whitespace: 2025-07-23 23:50:57
 // Auto-commit whitespace: 2025-07-23 23:51:58
 // Auto-commit whitespace: 2025-07-23 23:54:03
+
+// Auto-commit spacing update: 2025-07-24 00:00:15
