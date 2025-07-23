@@ -25,7 +25,7 @@ npx hardhat run scripts/deploy.js --network baseTestnet
 
 ## Contract Address
 
-Deployed on Base Sepolia: `0x8E34C0FB5738b4e89737F300B1dee7898BeE0ee1`
+Deployed on Base Sepolia: `0xf5446D0De1Ae3348F1E8ced674AA893CCC58b228`
 
 ## Usage
 
