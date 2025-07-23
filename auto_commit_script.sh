@@ -101,7 +101,7 @@ while [ $commit_count -lt $total_commits ]; do
         )
         
         message=${commit_messages[$((RANDOM % ${#commit_messages[@]}))]}
-        git commit -m "$message (auto-commit $commit_count/$total_commits)"
+        git commit -m "$message "
         
         # Push to remote repository
         echo "   🚀 Pushing to remote..."
