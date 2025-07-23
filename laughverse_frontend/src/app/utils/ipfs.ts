@@ -102,3 +102,4 @@ export const uploadMetadataToIPFS = async (
     throw new Error("Failed to upload metadata to IPFS");
   }
 };
+// Auto-commit whitespace: 2025-07-23 15:26:40
