@@ -282,3 +282,4 @@ export default function MintPage() {
 }
 
 // Auto-commit spacing update: 2025-07-23 15:33:17
+// Auto-commit whitespace: 2025-07-23 15:40:01
