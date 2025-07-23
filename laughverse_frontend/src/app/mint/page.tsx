@@ -2,10 +2,17 @@
 
 import { useState } from "react";
 import Navbar from "../components/Navbar";
-import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useAccount,
+  useChainId,
+  useSwitchChain,
+} from "wagmi";
 import abi from "../smart-contracts/abi.json";
 import { CONTRACT_ADDRESS } from "../smart-contracts/constants";
 import { uploadToIPFS, uploadMetadataToIPFS } from "../utils/ipfs";
+import { baseSepolia } from "wagmi/chains";
 
 export default function MintPage() {
   const [title, setTitle] = useState("");
@@ -14,6 +21,10 @@ export default function MintPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedUri, setUploadedUri] = useState<string>("");
   const [error, setError] = useState<string>("");
+
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
 
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -42,8 +53,20 @@ export default function MintPage() {
   };
 
   const handleMint = async () => {
+    if (!isConnected) {
+      setError("Please connect your wallet first");
+      return;
+    }
+
+    if (chainId !== baseSepolia.id) {
+      setError("Please switch to Base Sepolia testnet");
+      if (switchChain) {
+        switchChain({ chainId: baseSepolia.id });
+      }
+      return;
+    }
+
     if (!title || !description || !file) {
-      alert("Please fill in all fields and upload a file");
       setError("Please fill in all fields and upload a file");
       return;
     }
@@ -122,6 +145,29 @@ export default function MintPage() {
               Mint New Laugh NFT
             </h1>
 
+            {/* Network Status */}
+            {!isConnected ? (
+              <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+                Please connect your wallet to continue
+              </div>
+            ) : chainId !== baseSepolia.id ? (
+              <div className="mb-4 p-3 bg-orange-100 border border-orange-400 text-orange-700 rounded">
+                <div className="flex items-center justify-between">
+                  <span>Please switch to Base Sepolia testnet</span>
+                  <button
+                    onClick={() => switchChain?.({ chainId: baseSepolia.id })}
+                    className="px-3 py-1 bg-orange-500 text-white rounded text-sm hover:bg-orange-600"
+                  >
+                    Switch Network
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+                ✅ Connected to Base Sepolia testnet
+              </div>
+            )}
+
             {error && (
               <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                 {error}
@@ -192,7 +238,13 @@ export default function MintPage() {
               </div>
               {/* Minting Cost Info */}
               <div className="text-xs sm:text-sm text-gray-600">
-                Minting Cost: 0.00001 ETH + Transaction Fees
+                Minting Cost: 0.00001 ETH (Base Sepolia Testnet) + Transaction
+                Fees
+                <br />
+                <span className="text-blue-600">
+                  Get free test ETH from:
+                  https://www.coinbase.com/faucets/base-ethereum-goerli-faucet
+                </span>
               </div>
               {/* Mint Button */}
               <div className="flex justify-end">
@@ -205,7 +257,9 @@ export default function MintPage() {
                     isUploading ||
                     !title ||
                     !description ||
-                    !file
+                    !file ||
+                    !isConnected ||
+                    chainId !== baseSepolia.id
                   }
                   className="px-6 sm:px-8 py-2 sm:py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                 >
@@ -225,3 +279,5 @@ export default function MintPage() {
     </div>
   );
 }
+
+// Auto-commit spacing update: 2025-07-23 15:33:17
