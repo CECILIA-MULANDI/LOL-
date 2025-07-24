@@ -59,87 +59,30 @@ export function useBuyLaugh() {
 // Add this hook to fetch NFT metadata and media
 export function useNFTMedia(tokenId: string) {
   const [mediaUrl, setMediaUrl] = useState<string>("");
-  const [mediaType, setMediaType] = useState<"audio" | "video" | "unknown">(
-    "unknown"
-  );
+  const [mediaType, setMediaType] = useState<"video" | "audio" | "unknown">("unknown");
   const [isLoading, setIsLoading] = useState(true);
 
-  const { data: tokenURI } = useReadContract({
-    address: CONTRACT_ADDRESS as `0x${string}`,
-    abi,
-    functionName: "tokenURI",
-    args: [tokenId],
-  });
-
   useEffect(() => {
-    const fetchMedia = async () => {
-      if (!tokenURI) return;
-
+    async function fetchMedia() {
       try {
         setIsLoading(true);
-
-        // Convert IPFS URI to HTTP URL
-        const metadataUrl =
-          typeof tokenURI === "string"
-            ? tokenURI.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/")
-            : "";
-        if (!metadataUrl) {
-          throw new Error("Invalid tokenURI");
+        const response = await fetch(`https://gateway.pinata.cloud/ipfs/${tokenId}`);
+        if (response.ok) {
+          const contentType = response.headers.get('content-type') || '';
+          setMediaUrl(response.url);
+          setMediaType(contentType.startsWith('video/') ? 'video' : 'audio');
         }
-
-        // Fetch metadata
-        const metadataResponse = await fetch(metadataUrl);
-        const metadata = await metadataResponse.json();
-
-        if (metadata.image) {
-          const mediaUrl = metadata.image.replace(
-            "ipfs://",
-            "https://gateway.pinata.cloud/ipfs/"
-          );
-          setMediaUrl(mediaUrl);
-
-          // Try to detect media type from URL first
-          if (
-            mediaUrl.includes(".mp4") ||
-            mediaUrl.includes(".webm") ||
-            mediaUrl.includes(".mov")
-          ) {
-            setMediaType("video");
-          } else if (
-            mediaUrl.includes(".mp3") ||
-            mediaUrl.includes(".wav") ||
-            mediaUrl.includes(".ogg")
-          ) {
-            setMediaType("audio");
-          } else {
-            // If no extension, try to detect by making a HEAD request
-            try {
-              const response = await fetch(mediaUrl, { method: "HEAD" });
-              const contentType = response.headers.get("content-type");
-
-              if (contentType?.startsWith("audio/")) {
-                setMediaType("audio");
-              } else if (contentType?.startsWith("video/")) {
-                setMediaType("video");
-              } else {
-                // Default to audio for laugh NFTs if we can't determine
-                setMediaType("audio");
-              }
-            } catch (error) {
-              console.log("Could not detect content type, defaulting to audio");
-              setMediaType("audio");
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch media:", error);
+      } catch (err) {
+        console.error("Failed to fetch media:", err);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    fetchMedia();
-  }, [tokenURI]);
+    if (tokenId) {
+      fetchMedia();
+    }
+  }, [tokenId]);
 
   return { mediaUrl, mediaType, isLoading };
 }

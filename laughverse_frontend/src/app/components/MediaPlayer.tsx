@@ -17,6 +17,7 @@ export default function MediaPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [volume, setVolume] = useState(1);
   const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement>(null);
 
   // Debug logging
@@ -91,6 +92,14 @@ export default function MediaPlayer({
   const handleCanPlay = () => {
     console.log("Can play event fired");
     setIsLoading(false);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (mediaRef.current) {
+      mediaRef.current.volume = newVolume;
+    }
   };
 
   if (mediaType === "unknown" || !mediaUrl) {

@@ -22,11 +22,10 @@ export default function MintPage() {
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedUri, setUploadedUri] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
@@ -86,7 +85,6 @@ export default function MintPage() {
       // Step 1: Upload file to IPFS
       console.log("Uploading file to IPFS...");
       const fileUri = await uploadToIPFS(file);
-      setUploadedUri(fileUri);
       console.log("File uploaded:", fileUri);
 
       // Step 2: Create and upload metadata
