@@ -29,3 +29,5 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
   );
 }
 // Auto-commit whitespace: 2025-07-24 18:51:53
+
+// Auto-commit spacing update: 2025-07-24 18:52:55
