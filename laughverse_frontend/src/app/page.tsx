@@ -15,11 +15,11 @@ export default function Home() {
       <Navbar />
 
       {/* Debug: Test dark mode */}
-      <div className="text-center py-4">
+      {/* <div className="text-center py-4">
         <p className="text-gray-800 dark:text-white">
           Dark mode test - this text should change color
         </p>
-      </div>
+      </div> */}
 
       <main className="px-2 sm:px-8 py-6">
         {/* Hero Section */}
