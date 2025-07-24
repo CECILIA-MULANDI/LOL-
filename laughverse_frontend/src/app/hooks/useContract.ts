@@ -59,18 +59,22 @@ export function useBuyLaugh() {
 // Add this hook to fetch NFT metadata and media
 export function useNFTMedia(tokenId: string) {
   const [mediaUrl, setMediaUrl] = useState<string>("");
-  const [mediaType, setMediaType] = useState<"video" | "audio" | "unknown">("unknown");
+  const [mediaType, setMediaType] = useState<"video" | "audio" | "unknown">(
+    "unknown"
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchMedia() {
       try {
         setIsLoading(true);
-        const response = await fetch(`https://gateway.pinata.cloud/ipfs/${tokenId}`);
+        const response = await fetch(
+          `https://gateway.pinata.cloud/ipfs/${tokenId}`
+        );
         if (response.ok) {
-          const contentType = response.headers.get('content-type') || '';
+          const contentType = response.headers.get("content-type") || "";
           setMediaUrl(response.url);
-          setMediaType(contentType.startsWith('video/') ? 'video' : 'audio');
+          setMediaType(contentType.startsWith("video/") ? "video" : "audio");
         }
       } catch (err) {
         console.error("Failed to fetch media:", err);

@@ -201,7 +201,7 @@ export default function NFTDetailPage({
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <MediaPlayer
               mediaUrl={mediaUrl}
-              mediaType={mediaType}
+              mediaType={mediaType as "video" | "audio" | "unknown"}
               title={title}
             />
           </div>
