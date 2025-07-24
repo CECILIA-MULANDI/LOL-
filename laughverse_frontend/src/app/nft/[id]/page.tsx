@@ -11,6 +11,85 @@ import { useGetLaughData, useNFTMedia } from "../../hooks/useContract";
 import { CONTRACT_ADDRESS } from "../../smart-contracts/constants";
 import abi from "../../smart-contracts/abi.json";
 import MediaPlayer from "../../components/MediaPlayer";
+import { formatEther } from "viem";
+
+// Add ListForSaleForm component
+function ListForSaleForm({ tokenId }: { tokenId: string }) {
+  const [price, setPrice] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const { writeContract, isPending } = useWriteContract();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!price) return;
+
+    try {
+      await writeContract({
+        address: CONTRACT_ADDRESS as `0x${string}`,
+        abi,
+        functionName: "listForSale",
+        args: [tokenId, BigInt(parseFloat(price) * 1e18)],
+      });
+      setShowModal(false);
+      setPrice("");
+    } catch (error) {
+      console.error("Listing failed:", error);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setShowModal(true)}
+        className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+      >
+        List for Sale
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-sm w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+              List for Sale
+            </h3>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Price (ETH)
+                </label>
+                <input
+                  type="number"
+                  step="0.001"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0.001"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending || !price}
+                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                >
+                  {isPending ? "Listing..." : "List"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function NFTDetailPage({
   params,
@@ -18,20 +97,14 @@ export default function NFTDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data: laughData, isLoading, error, refetch } = useGetLaughData(id);
-  const { mediaUrl, mediaType, isLoading: mediaLoading } = useNFTMedia(id);
+  const { mediaUrl, mediaType } = useNFTMedia(id);
 
-  // Separate write contracts for better control
-  const {
-    writeContract: listForSale,
-    data: listHash,
-    isPending: isListing,
-  } = useWriteContract();
   const {
     writeContract: buyLaugh,
     data: buyHash,
-    isPending: isBuying,
+    isPending: isPurchasing,
   } = useWriteContract();
   const {
     writeContract: removeFromSale,
@@ -39,76 +112,19 @@ export default function NFTDetailPage({
     isPending: isRemoving,
   } = useWriteContract();
 
-  // Wait for transactions
-  const { isLoading: isListConfirming } = useWaitForTransactionReceipt({
-    hash: listHash,
-  });
-  const { isLoading: isBuyConfirming, isSuccess: buySuccess } =
+  const { isLoading: isPurchaseConfirming, isSuccess: buySuccess } =
     useWaitForTransactionReceipt({ hash: buyHash });
   const { isLoading: isRemoveConfirming } = useWaitForTransactionReceipt({
     hash: removeHash,
   });
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [listPrice, setListPrice] = useState("");
-  const [showListModal, setShowListModal] = useState(false);
-  const [buyError, setBuyError] = useState("");
 
   // Refetch data when buy is successful
   if (buySuccess) {
     refetch();
   }
 
-  // Extracted button label to avoid nested ternary in JSX
-  let buyButtonLabel = "Buy Now";
-  if (isBuying) {
-    buyButtonLabel = "Confirming Purchase...";
-  } else if (isBuyConfirming) {
-    buyButtonLabel = "Processing...";
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-cream">
-        <Navbar />
-        <main className="px-2 sm:px-8 py-6">
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4">⏳</div>
-            <p className="text-gray-600">Loading NFT details...</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (error || !laughData) {
-    return (
-      <div className="min-h-screen bg-cream">
-        <Navbar />
-        <main className="px-2 sm:px-8 py-6">
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">❌</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
-              NFT Not Found
-            </h3>
-            <p className="text-gray-600">
-              This laugh NFT doesn&#39;t exist or failed to load.
-            </p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const [creator, title, description, price, forSale] = Array.isArray(laughData)
-    ? laughData
-    : ["", "", "", 0, false];
-  const isOwner = address?.toLowerCase() === creator.toLowerCase();
-
-  const handleBuyNow = async () => {
+  const handlePurchase = async () => {
     if (!forSale || !address) return;
-
-    setBuyError("");
 
     try {
       await buyLaugh({
@@ -118,30 +134,8 @@ export default function NFTDetailPage({
         args: [id],
         value: BigInt(price.toString()),
       });
-    } catch (error: unknown) {
-      console.error("Purchase failed:", error);
-      if (error instanceof Error) {
-        setBuyError(error.message || "Purchase failed. Please try again.");
-      } else {
-        setBuyError("Purchase failed. Please try again.");
-      }
-    }
-  };
-
-  const handleList = async () => {
-    if (!listPrice) return;
-
-    try {
-      await listForSale({
-        address: CONTRACT_ADDRESS as `0x${string}`,
-        abi,
-        functionName: "listForSale",
-        args: [id, BigInt(parseFloat(listPrice) * 1e18)],
-      });
-      setShowListModal(false);
-      setListPrice("");
     } catch (error) {
-      console.error("Listing failed:", error);
+      console.error("Purchase failed:", error);
     }
   };
 
@@ -158,11 +152,45 @@ export default function NFTDetailPage({
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
+        <Navbar />
+        <main className="px-2 sm:px-8 py-6">
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">⏳</div>
+            <p className="text-gray-600 dark:text-gray-300">
+              Loading NFT details...
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !laughData) {
+    return (
+      <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
+        <Navbar />
+        <main className="px-2 sm:px-8 py-6">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">❌</div>
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+              NFT Not Found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              This laugh NFT doesn&#39;t exist or failed to load.
+            </p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const [creator, title, , price, forSale] = Array.isArray(laughData)
+    ? laughData
+    : ["", "", "", 0, false];
+  const isOwner = address?.toLowerCase() === creator.toLowerCase();
 
   return (
     <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
@@ -184,68 +212,28 @@ export default function NFTDetailPage({
               <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-800 dark:text-white mb-2">
                 {title}
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-                {description}
-              </p>
             </div>
 
-            {/* Creator and Owner Info */}
-            <div className="mb-6 space-y-4">
-              {/* Creator */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                  Creator
-                </h3>
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="white"
-                    >
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800 dark:text-white">
-                      {creator.slice(0, 6)}...{creator.slice(-4)}
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      Original Creator
-                    </p>
-                  </div>
+            {/* Creator Info */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                Creator
+              </h3>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 dark:text-white">
+                    {creator.slice(0, 6)}...{creator.slice(-4)}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Original Creator
+                  </p>
                 </div>
               </div>
-
-              {/* Current Owner */}
-              {address && creator.toLowerCase() !== address.toLowerCase() && (
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
-                    Current Owner
-                  </h3>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="white"
-                      >
-                        <path d="M5 16L3 14l5.5-5.5L16 16l-5.5 5.5L5 16z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-white">
-                        {address.slice(0, 6)}...{address.slice(-4)}
-                      </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        {isOwner ? "You" : "Current Owner"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Status */}

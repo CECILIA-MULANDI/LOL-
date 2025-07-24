@@ -12,24 +12,17 @@ export default function MediaPlayer({
   mediaType,
   title,
 }: MediaPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement>(null);
 
   // Debug logging
   useEffect(() => {
     console.log("MediaPlayer props:", { mediaUrl, mediaType, title });
   }, [mediaUrl, mediaType, title]);
-
-  useEffect(() => {
-    if (mediaRef.current) {
-      mediaRef.current.volume = volume;
-    }
-  }, [volume]);
 
   const handlePlayPause = async () => {
     if (!mediaRef.current) {
@@ -87,7 +80,9 @@ export default function MediaPlayer({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleError = (e: any) => {
+  const handleError = (
+    e: React.SyntheticEvent<HTMLAudioElement | HTMLVideoElement, Event>
+  ) => {
     console.error("Media error:", e);
     setError("Failed to load media");
     setIsLoading(false);
