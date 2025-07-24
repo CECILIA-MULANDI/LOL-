@@ -3,7 +3,7 @@
 // Auto-commit update: 2025-07-23 15:38:57
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import {
   useWriteContract,
@@ -24,6 +24,7 @@ export default function MintPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedUri, setUploadedUri] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -33,6 +34,10 @@ export default function MintPage() {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -110,6 +115,28 @@ export default function MintPage() {
       setIsUploading(false);
     }
   };
+
+  // Show loading state during hydration
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-cream">
+        <Navbar />
+        <main className="px-2 sm:px-8 py-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8">
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
+                Mint New Laugh NFT
+              </h1>
+              <div className="text-center py-12">
+                <div className="text-4xl mb-4">⏳</div>
+                <p className="text-gray-600">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   // Show success message when transaction is confirmed
   if (isSuccess) {

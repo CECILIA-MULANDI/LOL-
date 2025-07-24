@@ -214,4 +214,39 @@ contract LaughterNFT is ERC721, ERC721URIStorage, ReentrancyGuard, Ownable {
     ) internal override(ERC721) returns (address) {
         return super._update(to, tokenId, auth);
     }
+
+    function getTokensEverOwnedBy(
+        address owner
+    ) external view returns (uint256[] memory, bool[] memory) {
+        uint256 count = 0;
+
+        // Count tokens ever owned
+        for (uint256 i = 0; i < _tokenIdCounter; i++) {
+            if (
+                _exists(i) &&
+                (laughs[i].creator == owner || ownerOf(i) == owner)
+            ) {
+                count++;
+            }
+        }
+
+        uint256[] memory tokens = new uint256[](count);
+        bool[] memory stillOwned = new bool[](count);
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < _tokenIdCounter; i++) {
+            if (_exists(i)) {
+                bool isCreator = laughs[i].creator == owner;
+                bool isCurrentOwner = ownerOf(i) == owner;
+
+                if (isCreator || isCurrentOwner) {
+                    tokens[index] = i;
+                    stillOwned[index] = isCurrentOwner;
+                    index++;
+                }
+            }
+        }
+
+        return (tokens, stillOwned);
+    }
 }
