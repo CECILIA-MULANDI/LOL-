@@ -23,7 +23,7 @@ const activity = [
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
       <Navbar />
       <main className="max-w-5xl mx-auto px-2 sm:px-4 py-6 sm:py-8">
         {/* Profile Header */}
@@ -31,15 +31,15 @@ export default function ProfilePage() {
           <img
             src="/avatar.png"
             alt="Sarah Miller"
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4 border-4 border-white shadow"
+            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mb-4 border-4 border-white dark:border-gray-600 shadow"
           />
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">
             Sarah Miller
           </h2>
-          <div className="text-gray-500 text-sm sm:text-base">
+          <div className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
             @sarah_miller
           </div>
-          <div className="text-gray-400 text-xs sm:text-sm mt-1">
+          <div className="text-gray-400 dark:text-gray-500 text-xs sm:text-sm mt-1">
             Joined 2021
           </div>
         </div>

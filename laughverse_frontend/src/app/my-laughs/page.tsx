@@ -163,15 +163,15 @@ export default function MyLaughsPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-cream">
+      <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
         <Navbar />
         <main className="px-2 sm:px-8 py-6">
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔗</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               Connect Your Wallet
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Please connect your wallet to view your laugh collection
             </p>
           </div>
@@ -181,14 +181,14 @@ export default function MyLaughsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
       <Navbar />
       <main className="px-2 sm:px-8 py-6">
         <div className="mb-8">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2 sm:mb-4">
             My Laughs
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
             Manage your laugh NFT collection
           </p>
         </div>

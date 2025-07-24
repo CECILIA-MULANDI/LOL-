@@ -107,23 +107,10 @@ export default function MediaPlayer({
   }
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden">
-      {/* Media Element */}
-      {mediaType === "video" ? (
-        <video
-          ref={mediaRef as React.RefObject<HTMLVideoElement>}
-          className="w-full aspect-video bg-black"
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={() => setIsPlaying(false)}
-          onLoadStart={() => setIsLoading(true)}
-          controls={false}
-        >
-          <source src={mediaUrl} />
-          Your browser does not support video playback.
-        </video>
-      ) : (
-        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center relative">
+    <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      {/* Media Display */}
+      <div className="relative">
+        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 dark:from-purple-600 dark:to-pink-600 rounded-lg flex items-center justify-center relative">
           <audio
             ref={mediaRef as React.RefObject<HTMLAudioElement>}
             onTimeUpdate={handleTimeUpdate}
@@ -145,47 +132,18 @@ export default function MediaPlayer({
             </div>
           )}
 
-          {/* Audio Visualization */}
-          <div className="text-center">
-            <div className="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="white">
-                <path d="M12 2C13.1 2 14 2.9 14 4V8C14 9.1 13.1 10 12 10S10 9.1 10 8V4C10 2.9 10.9 2 12 2M19 10V12C19 15.9 15.9 19 12 19S5 15.9 5 12V10H7V12C7 14.8 9.2 17 12 17S17 14.8 17 12V10H19M12 21C12.6 21 13 21.4 13 22H11C11 21.4 11.4 21 12 21Z" />
-              </svg>
-            </div>
-            <div className="text-white font-medium">{title}</div>
-          </div>
-
-          {/* Playing indicator */}
-          {isPlaying && (
-            <div className="absolute inset-0 bg-black bg-opacity-20 rounded-lg flex items-center justify-center">
-              <div className="flex space-x-1">
-                <div className="w-2 h-8 bg-white rounded animate-pulse"></div>
-                <div
-                  className="w-2 h-6 bg-white rounded animate-pulse"
-                  style={{ animationDelay: "0.1s" }}
-                ></div>
-                <div
-                  className="w-2 h-10 bg-white rounded animate-pulse"
-                  style={{ animationDelay: "0.2s" }}
-                ></div>
-                <div
-                  className="w-2 h-4 bg-white rounded animate-pulse"
-                  style={{ animationDelay: "0.3s" }}
-                ></div>
-              </div>
-            </div>
-          )}
+          <div className="text-6xl">🎵</div>
         </div>
-      )}
+      </div>
 
       {/* Controls */}
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 bg-white dark:bg-gray-800">
         {/* Play/Pause Button */}
         <div className="flex items-center justify-center">
           <button
             onClick={handlePlayPause}
             disabled={isLoading}
-            className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-12 h-12 bg-red-500 dark:bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-600 dark:hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -212,17 +170,16 @@ export default function MediaPlayer({
         </div>
 
         {/* Progress Bar */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           <input
             type="range"
             min="0"
             max={duration || 0}
             value={currentTime}
             onChange={handleSeek}
-            disabled={isLoading}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider disabled:opacity-50"
+            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
           />
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
@@ -235,9 +192,9 @@ export default function MediaPlayer({
             height="16"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="text-gray-600"
+            className="text-gray-500 dark:text-gray-400"
           >
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
           </svg>
           <input
             type="range"
@@ -245,15 +202,16 @@ export default function MediaPlayer({
             max="1"
             step="0.1"
             value={volume}
-            onChange={(e) => {
-              const vol = parseFloat(e.target.value);
-              setVolume(vol);
-              if (mediaRef.current) {
-                mediaRef.current.volume = vol;
-              }
-            }}
-            className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            onChange={handleVolumeChange}
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
           />
+        </div>
+
+        {/* Title */}
+        <div className="text-center">
+          <h3 className="font-semibold text-gray-800 dark:text-white">
+            {title}
+          </h3>
         </div>
       </div>
     </div>

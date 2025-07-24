@@ -14,14 +14,14 @@ export default function ExplorePage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
       <Navbar />
       <main className="px-2 sm:px-8 py-6">
         <div className="mb-8">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white mb-2 sm:mb-4">
             Explore Laughs
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
             Discover the funniest laugh NFTs in the marketplace
           </p>
         </div>

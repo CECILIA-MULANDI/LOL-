@@ -165,207 +165,143 @@ export default function NFTDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
       <Navbar />
-      <main className="px-2 sm:px-8 py-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Media Player */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8">
-                {mediaLoading ? (
-                  <div className="aspect-square bg-peach rounded-lg flex items-center justify-center">
-                    <div className="text-6xl animate-pulse">⏳</div>
-                  </div>
-                ) : (
-                  <MediaPlayer
-                    mediaUrl={mediaUrl}
-                    mediaType={mediaType}
-                    title={title}
-                  />
-                )}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left: Media Player */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <MediaPlayer
+              mediaUrl={mediaUrl}
+              mediaType={mediaType}
+              title={title}
+            />
+          </div>
 
-                <div className="text-center mt-4">
-                  <h1 className="text-lg sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">
-                    {title}
-                  </h1>
-                  <p className="text-gray-600 text-sm sm:text-base">
-                    by {creator.slice(0, 6)}...{creator.slice(-4)}
-                  </p>
-                </div>
-              </div>
+          {/* Right: NFT Details */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div className="mb-6">
+              <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-800 dark:text-white mb-2">
+                {title}
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+                {description}
+              </p>
             </div>
 
-            {/* Right Column - Details and Purchase */}
-            <div className="space-y-6 mt-8 lg:mt-0">
-              {/* NFT Details */}
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-4">
-                  {title}
-                </h2>
-                <p className="text-gray-600 text-sm sm:text-base mb-4 sm:mb-6">
-                  {description}
-                </p>
-
-                {/* Creator and Owner Info */}
-                <div className="mb-4 sm:mb-6 space-y-4">
-                  {/* Creator */}
+            {/* Creator and Owner Info */}
+            <div className="mb-6 space-y-4">
+              {/* Creator */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                  Creator
+                </h3>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="white"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
-                      Creator
-                    </h3>
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-400 rounded-full flex items-center justify-center">
-                        <span className="text-lg sm:text-xl">🎨</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-800 text-sm sm:text-base">
-                          {creator.slice(0, 6)}...{creator.slice(-4)}
-                        </p>
-                        <p className="text-gray-600 text-xs sm:text-sm">
-                          Original Creator
-                        </p>
-                      </div>
+                    <p className="font-semibold text-gray-800 dark:text-white">
+                      {creator.slice(0, 6)}...{creator.slice(-4)}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      Original Creator
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Current Owner */}
+              {address && creator.toLowerCase() !== address.toLowerCase() && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Current Owner
+                  </h3>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="white"
+                      >
+                        <path d="M5 16L3 14l5.5-5.5L16 16l-5.5 5.5L5 16z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800 dark:text-white">
+                        {address.slice(0, 6)}...{address.slice(-4)}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        {isOwner ? "You" : "Current Owner"}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Current Owner (if different from creator) */}
-                  {address &&
-                    creator.toLowerCase() !== address.toLowerCase() && (
-                      <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
-                          Current Owner
-                        </h3>
-                        <div className="flex items-center space-x-2 sm:space-x-3">
-                          <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-400 rounded-full flex items-center justify-center">
-                            <span className="text-lg sm:text-xl">👑</span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-800 text-sm sm:text-base">
-                              {address.slice(0, 6)}...{address.slice(-4)}
-                            </p>
-                            <p className="text-gray-600 text-xs sm:text-sm">
-                              {isOwner ? "You" : "Current Owner"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                 </div>
+              )}
+            </div>
 
-                {/* Price and Actions */}
-                <div className="mb-4 sm:mb-6">
-                  {forSale ? (
-                    <>
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
-                        Price
-                      </h3>
-                      <p className="text-lg sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-4">
-                        {(Number(price) / 1e18).toFixed(4)} ETH
-                      </p>
+            {/* Status */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                Status
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {forSale
+                  ? `For sale at ${formatEther(price)} ETH`
+                  : "Not for sale"}
+              </p>
+            </div>
 
-                      {/* Buy Error */}
-                      {buyError && (
-                        <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
-                          <p className="text-red-700 text-sm">{buyError}</p>
-                        </div>
-                      )}
-
-                      {/* Buy Success */}
-                      {!isOwner && (
-                        <button
-                          onClick={handleBuyNow}
-                          disabled={isBuying || isBuyConfirming}
-                          className="w-full px-4 sm:px-6 py-2 sm:py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
-                        >
-                          {buyButtonLabel}
-                        </button>
-                      )}
-
-                      {isOwner && (
-                        <div className="space-y-3">
-                          <div className="text-center py-4 text-gray-600">
-                            This is your NFT (listed for sale)
-                          </div>
-                          <button
-                            onClick={handleRemoveFromSale}
-                            disabled={isRemoving || isRemoveConfirming}
-                            className="w-full px-4 sm:px-6 py-2 sm:py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 disabled:opacity-50 transition-colors text-sm sm:text-base"
-                          >
-                            {isRemoving || isRemoveConfirming
-                              ? "Removing..."
-                              : "Remove from Sale"}
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">
-                        Status
-                      </h3>
-                      <p className="text-gray-600 mb-4">Not for sale</p>
-                      {isOwner && (
-                        <button
-                          onClick={() => setShowListModal(true)}
-                          disabled={isListing || isListConfirming}
-                          className="w-full px-4 sm:px-6 py-2 sm:py-3 bg-peach text-gray-800 rounded-lg font-semibold hover:bg-opacity-80 disabled:opacity-50 transition-colors text-sm sm:text-base"
-                        >
-                          {isListing || isListConfirming
-                            ? "Listing..."
-                            : "List for Sale"}
-                        </button>
-                      )}
-                    </>
-                  )}
+            {/* Action Buttons */}
+            <div className="space-y-4">
+              {!isConnected ? (
+                <div className="text-center py-4 text-gray-600 dark:text-gray-400">
+                  Connect your wallet to interact with this NFT
                 </div>
-              </div>
-
-              {/* Ownership History - TODO: Implement with events */}
-              <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-4">
-                  Ownership History
-                </h3>
-                <div className="text-center py-8 text-gray-500">
-                  <div className="text-4xl mb-2">📜</div>
-                  <p>Ownership history coming soon</p>
+              ) : forSale && !isOwner ? (
+                <button
+                  onClick={handlePurchase}
+                  disabled={isPurchasing || isPurchaseConfirming}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 transition-all duration-200"
+                >
+                  {isPurchasing || isPurchaseConfirming
+                    ? "Processing..."
+                    : `Buy for ${formatEther(price)} ETH`}
+                </button>
+              ) : isOwner && forSale ? (
+                <div className="space-y-3">
+                  <div className="text-center py-4 text-gray-600 dark:text-gray-400">
+                    This is your NFT (listed for sale)
+                  </div>
+                  <button
+                    onClick={handleRemoveFromSale}
+                    disabled={isRemoving || isRemoveConfirming}
+                    className="w-full px-6 py-3 bg-gray-500 dark:bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-600 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                  >
+                    {isRemoving || isRemoveConfirming
+                      ? "Removing..."
+                      : "Remove from Sale"}
+                  </button>
                 </div>
-              </div>
+              ) : isOwner && !forSale ? (
+                <ListForSaleForm tokenId={id} />
+              ) : (
+                <div className="text-center py-4 text-gray-600 dark:text-gray-400">
+                  This NFT is not currently for sale
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </main>
-
-      {/* List Modal */}
-      {showListModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">List for Sale</h3>
-            <input
-              type="number"
-              step="0.001"
-              placeholder="Price in ETH"
-              value={listPrice}
-              onChange={(e) => setListPrice(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg mb-4"
-            />
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowListModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-200 rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleList}
-                className="flex-1 px-4 py-2 bg-peach rounded-lg"
-              >
-                List
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
