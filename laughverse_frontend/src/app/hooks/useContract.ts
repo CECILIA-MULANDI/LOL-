@@ -83,9 +83,13 @@ export function useNFTMedia(tokenId: string) {
     "unknown"
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [metadata, setMetadata] = useState<Record<string, unknown> | null>(
-    null
-  );
+  const [metadata, setMetadata] = useState<{
+    name?: string;
+    description?: string;
+    image?: string;
+    animation_url?: string;
+    [key: string]: unknown;
+  } | null>(null);
 
   // Get the token URI from the smart contract
   const { data: tokenURI } = useGetTokenURI(tokenId);

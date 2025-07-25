@@ -23,7 +23,12 @@ export default function NFTCardWithActions({
 }: Readonly<NFTCardWithActionsProps>) {
   const { address } = useAccount();
   const { data: laughData, isLoading, refetch } = useGetLaughData(tokenId);
-  const { mediaUrl, mediaType, isLoading: mediaLoading } = useNFTMedia(tokenId);
+  const {
+    mediaUrl,
+    mediaType,
+    isLoading: mediaLoading,
+    metadata,
+  } = useNFTMedia(tokenId);
   const { data: currentOwner } = useGetOwner(tokenId);
 
   const { writeContract: listForSale, isPending: isListing } =
@@ -220,6 +225,14 @@ export default function NFTCardWithActions({
           <h3 className="font-semibold text-gray-800 mb-1">
             {title || "Untitled"}
           </h3>
+          {metadata?.description &&
+            typeof metadata.description === "string" && (
+              <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                {metadata.description.length > 80
+                  ? `${metadata.description.substring(0, 80)}...`
+                  : metadata.description}
+              </p>
+            )}
           <p className="text-sm text-gray-500">
             by{" "}
             {creator

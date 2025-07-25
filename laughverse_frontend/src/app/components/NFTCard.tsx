@@ -3,7 +3,6 @@ import Link from "next/link";
 interface NFTCardProps {
   title: string;
   creator: string;
-  image: string;
   price?: string;
   id?: string;
 }
@@ -11,7 +10,6 @@ interface NFTCardProps {
 export default function NFTCard({
   title,
   creator,
-  image,
   price,
   id = "1",
 }: NFTCardProps) {

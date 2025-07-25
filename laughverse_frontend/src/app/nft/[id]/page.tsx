@@ -103,7 +103,7 @@ export default function NFTDetailPage({
   const { id } = use(params);
   const { address, isConnected } = useAccount();
   const { data: laughData, isLoading, error, refetch } = useGetLaughData(id);
-  const { mediaUrl, mediaType } = useNFTMedia(id);
+  const { mediaUrl, mediaType, metadata } = useNFTMedia(id);
   const { data: currentOwner, isLoading: ownerLoading } = useGetOwner(id);
 
   const {
@@ -222,7 +222,25 @@ export default function NFTDetailPage({
               <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-800 dark:text-white mb-2">
                 {title}
               </h1>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Token ID: {id}
+              </p>
             </div>
+
+            {/* Description */}
+            {metadata?.description &&
+              typeof metadata.description === "string" && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                    Description
+                  </h3>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {metadata.description}
+                    </p>
+                  </div>
+                </div>
+              )}
 
             {/* Creator Info */}
             <div className="mb-6">
