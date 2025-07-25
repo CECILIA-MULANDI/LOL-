@@ -104,8 +104,28 @@ export default function MediaPlayer({
 
   if (mediaType === "unknown" || !mediaUrl) {
     return (
-      <div className="aspect-square bg-peach rounded-lg flex items-center justify-center">
-        <div className="text-6xl">😂</div>
+      <div className="aspect-square bg-gradient-to-br from-purple-100 via-pink-50 to-orange-100 dark:from-purple-900 dark:via-pink-900 dark:to-orange-900 rounded-lg flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          {/* Professional content icon */}
+          <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+            <svg
+              className="w-12 h-12 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          {/* Decorative elements */}
+          <div className="flex space-x-2">
+            <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-pink-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+            Content Preview
+          </div>
+        </div>
       </div>
     );
   }
@@ -155,11 +175,27 @@ export default function MediaPlayer({
             </div>
           )}
 
-          {/* Show icon only for audio or when video is not playing */}
+          {/* Show professional icon only for audio or when video is not playing */}
           {(mediaType === "audio" || (mediaType === "video" && !isPlaying)) && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-6xl">
-                {mediaType === "video" ? "🎬" : "🎵"}
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                {mediaType === "video" ? (
+                  <svg
+                    className="w-10 h-10 text-white ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-10 h-10 text-white"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                )}
               </div>
             </div>
           )}

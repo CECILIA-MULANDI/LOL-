@@ -119,27 +119,98 @@ export default function NFTCardWithActions({
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <Link href={`/nft/${tokenId}`} className="block">
         {mediaLoading ? (
-          <div className="aspect-square bg-peach rounded-t-lg flex items-center justify-center">
-            <div className="text-4xl animate-pulse">⏳</div>
+          <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-t-lg flex items-center justify-center">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                Loading...
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="aspect-square bg-peach rounded-t-lg flex items-center justify-center overflow-hidden relative">
+          <div className="aspect-square bg-gradient-to-br from-purple-100 via-pink-50 to-orange-100 dark:from-purple-900 dark:via-pink-900 dark:to-orange-900 rounded-t-lg flex items-center justify-center overflow-hidden relative">
             {(() => {
               if (mediaType === "video" && mediaUrl) {
                 return (
-                  <video
-                    className="w-full h-full object-cover"
-                    muted
-                    preload="metadata"
-                    poster=""
-                  >
-                    <source src={mediaUrl} />
-                  </video>
+                  <>
+                    <video
+                      className="w-full h-full object-cover"
+                      muted
+                      preload="metadata"
+                      poster=""
+                    >
+                      <source src={mediaUrl} />
+                    </video>
+                    {/* Video overlay icon */}
+                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg">
+                        <svg
+                          className="w-8 h-8 text-gray-800 ml-1"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </>
                 );
               } else if (mediaType === "audio") {
-                return <div className="text-6xl">🎵</div>;
+                return (
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    {/* Professional audio icon */}
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                      <svg
+                        className="w-10 h-10 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                      </svg>
+                    </div>
+                    {/* Audio waves decoration */}
+                    <div className="flex space-x-1">
+                      <div className="w-1 h-4 bg-purple-400 rounded-full animate-pulse"></div>
+                      <div
+                        className="w-1 h-6 bg-pink-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-1 h-3 bg-purple-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                      <div
+                        className="w-1 h-5 bg-pink-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.3s" }}
+                      ></div>
+                      <div
+                        className="w-1 h-4 bg-purple-400 rounded-full animate-pulse"
+                        style={{ animationDelay: "0.4s" }}
+                      ></div>
+                    </div>
+                  </div>
+                );
               } else {
-                return <div className="text-6xl">😂</div>;
+                return (
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    {/* Professional content icon */}
+                    <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                      <svg
+                        className="w-10 h-10 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    {/* Decorative elements */}
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    </div>
+                  </div>
+                );
               }
             })()}
           </div>
