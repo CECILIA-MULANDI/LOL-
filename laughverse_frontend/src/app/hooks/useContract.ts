@@ -83,7 +83,9 @@ export function useNFTMedia(tokenId: string) {
     "unknown"
   );
   const [isLoading, setIsLoading] = useState(true);
-  const [metadata, setMetadata] = useState<any>(null);
+  const [metadata, setMetadata] = useState<Record<string, unknown> | null>(
+    null
+  );
 
   // Get the token URI from the smart contract
   const { data: tokenURI } = useGetTokenURI(tokenId);
@@ -98,22 +100,98 @@ export function useNFTMedia(tokenId: string) {
           return;
         }
 
-        console.log("TokenURI:", tokenURI);
-
-        // Convert IPFS URI to HTTP gateway URL
-        let metadataUrl = tokenURI;
-        if (tokenURI.startsWith("ipfs://")) {
-          const ipfsHash = tokenURI.replace("ipfs://", "");
-          metadataUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+        // Check if this is a mock tokenURI (for development)
+        if (tokenURI.startsWith("ipfs://mock-")) {
+          console.log("Using mock data for development");
+          setMetadata({
+            name: `Mock NFT ${tokenId}`,
+            description: "This is a mock NFT for development",
+            image:
+              "https://via.placeholder.com/400x400/FF6B6B/FFFFFF?text=Mock+Audio",
+            animation_url:
+              "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+          });
+          setMediaUrl(
+            "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+          );
+          setMediaType("audio");
+          return;
         }
 
-        console.log("Fetching metadata from:", metadataUrl);
+        console.log("TokenURI:", tokenURI);
 
-        // Fetch the metadata JSON
-        const metadataResponse = await fetch(metadataUrl);
-        if (!metadataResponse.ok) {
-          throw new Error(
-            `Failed to fetch metadata: ${metadataResponse.status}`
+        // Convert IPFS URI to HTTP gateway URL with fallbacks
+        let metadataUrl = tokenURI;
+        const ipfsGateways = [
+          "https://gateway.pinata.cloud/ipfs/",
+          "https://ipfs.io/ipfs/",
+          "https://cloudflare-ipfs.com/ipfs/",
+          "https://dweb.link/ipfs/",
+        ];
+
+        if (tokenURI.startsWith("ipfs://")) {
+          const ipfsHash = tokenURI.replace("ipfs://", "");
+          metadataUrl = `${ipfsGateways[0]}${ipfsHash}`;
+        }
+
+        // Try multiple IPFS gateways if needed
+        let metadataResponse;
+        let lastError;
+
+        if (tokenURI.startsWith("ipfs://")) {
+          const ipfsHash = tokenURI.replace("ipfs://", "");
+
+          for (const gateway of ipfsGateways) {
+            const gatewayUrl = `${gateway}${ipfsHash}`;
+            console.log("Trying gateway:", gatewayUrl);
+
+            try {
+              metadataResponse = await fetch(gatewayUrl, {
+                method: "GET",
+                headers: {
+                  Accept: "application/json",
+                },
+                signal: AbortSignal.timeout(8000), // 8 second timeout per gateway
+              });
+
+              if (metadataResponse.ok) {
+                console.log("Successfully fetched from gateway:", gatewayUrl);
+                break;
+              } else {
+                console.warn(
+                  `Gateway ${gatewayUrl} returned ${metadataResponse.status}`
+                );
+                lastError = new Error(
+                  `HTTP ${metadataResponse.status}: ${metadataResponse.statusText}`
+                );
+              }
+            } catch (fetchError) {
+              console.warn("Gateway failed:", gatewayUrl, fetchError);
+              lastError = fetchError;
+              continue;
+            }
+          }
+        } else {
+          // Direct URL, not IPFS
+          console.log("Fetching metadata from direct URL:", metadataUrl);
+          try {
+            metadataResponse = await fetch(metadataUrl, {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+              },
+              signal: AbortSignal.timeout(10000),
+            });
+          } catch (fetchError) {
+            console.error("Network error fetching metadata:", fetchError);
+            throw new Error(`Network error: ${fetchError}`);
+          }
+        }
+
+        if (!metadataResponse || !metadataResponse.ok) {
+          console.error("All gateways failed or response not ok");
+          throw (
+            lastError || new Error("Failed to fetch metadata from any gateway")
           );
         }
 
@@ -159,7 +237,7 @@ export function useNFTMedia(tokenId: string) {
               setMediaType("unknown");
             }
           }
-        } catch (err) {
+        } catch {
           console.log("Could not determine content type, using fallback");
           // Fallback: check file extension
           const extension = mediaUri.split(".").pop()?.toLowerCase();
@@ -174,6 +252,9 @@ export function useNFTMedia(tokenId: string) {
       } catch (err) {
         console.error("Failed to fetch media:", err);
         setMediaType("unknown");
+        setMediaUrl("");
+        setMetadata(null);
+        // Don't throw the error, just log it and set fallback state
       } finally {
         setIsLoading(false);
       }

@@ -198,7 +198,6 @@ export default function NFTDetailPage({
 
   // Check if current user is the owner (not creator)
   const isOwner = address?.toLowerCase() === currentOwner?.toLowerCase();
-  const isCreator = address?.toLowerCase() === creator?.toLowerCase();
 
   return (
     <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
