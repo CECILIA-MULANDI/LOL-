@@ -6,7 +6,11 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import Link from "next/link";
-import { useGetLaughData, useNFTMedia } from "../hooks/useContract";
+import {
+  useGetLaughData,
+  useNFTMedia,
+  useGetOwner,
+} from "../hooks/useContract";
 import { CONTRACT_ADDRESS } from "../smart-contracts/constants";
 import abi from "../smart-contracts/abi.json";
 
@@ -20,6 +24,7 @@ export default function NFTCardWithActions({
   const { address } = useAccount();
   const { data: laughData, isLoading, refetch } = useGetLaughData(tokenId);
   const { mediaUrl, mediaType, isLoading: mediaLoading } = useNFTMedia(tokenId);
+  const { data: currentOwner } = useGetOwner(tokenId);
 
   const { writeContract: listForSale, isPending: isListing } =
     useWriteContract();
@@ -44,7 +49,9 @@ export default function NFTCardWithActions({
   const [creator, title, price, forSale] = Array.isArray(laughData)
     ? [laughData[0], laughData[1], laughData[3], laughData[4]]
     : [undefined, undefined, undefined, undefined];
-  const isOwner = address?.toLowerCase() === creator?.toLowerCase();
+
+  // Check if current user is the owner (not creator)
+  const isOwner = address?.toLowerCase() === currentOwner?.toLowerCase();
 
   const handleQuickBuy = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -113,11 +120,16 @@ export default function NFTCardWithActions({
             <div className="text-4xl animate-pulse">⏳</div>
           </div>
         ) : (
-          <div className="aspect-square bg-peach rounded-t-lg flex items-center justify-center overflow-hidden">
+          <div className="aspect-square bg-peach rounded-t-lg flex items-center justify-center overflow-hidden relative">
             {(() => {
-              if (mediaType === "video") {
+              if (mediaType === "video" && mediaUrl) {
                 return (
-                  <video className="w-full h-full object-cover" muted>
+                  <video
+                    className="w-full h-full object-cover"
+                    muted
+                    preload="metadata"
+                    poster=""
+                  >
                     <source src={mediaUrl} />
                   </video>
                 );

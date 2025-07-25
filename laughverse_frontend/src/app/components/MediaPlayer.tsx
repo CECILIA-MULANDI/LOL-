@@ -114,29 +114,62 @@ export default function MediaPlayer({
     <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
       {/* Media Display */}
       <div className="relative">
-        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 dark:from-purple-600 dark:to-pink-600 rounded-lg flex items-center justify-center relative">
-          <audio
-            ref={mediaRef as React.RefObject<HTMLAudioElement>}
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onEnded={() => setIsPlaying(false)}
-            onLoadStart={() => setIsLoading(true)}
-            onError={handleError}
-            onCanPlay={handleCanPlay}
-            preload="metadata"
-            crossOrigin="anonymous"
-          >
-            <source src={mediaUrl} type="audio/mpeg" />
-            Your browser does not support audio playback.
-          </audio>
+        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-400 dark:from-purple-600 dark:to-pink-600 rounded-lg flex items-center justify-center relative overflow-hidden">
+          {mediaType === "video" ? (
+            <video
+              ref={mediaRef as React.RefObject<HTMLVideoElement>}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onEnded={() => setIsPlaying(false)}
+              onLoadStart={() => setIsLoading(true)}
+              onError={handleError}
+              onCanPlay={handleCanPlay}
+              preload="metadata"
+              crossOrigin="anonymous"
+              className="w-full h-full object-cover rounded-lg"
+              controls={false}
+            >
+              <source src={mediaUrl} />
+              Your browser does not support video playback.
+            </video>
+          ) : (
+            <audio
+              ref={mediaRef as React.RefObject<HTMLAudioElement>}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={handleLoadedMetadata}
+              onEnded={() => setIsPlaying(false)}
+              onLoadStart={() => setIsLoading(true)}
+              onError={handleError}
+              onCanPlay={handleCanPlay}
+              preload="metadata"
+              crossOrigin="anonymous"
+            >
+              <source src={mediaUrl} />
+              Your browser does not support audio playback.
+            </audio>
+          )}
 
           {error && (
-            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs p-1 rounded">
+            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs p-1 rounded z-10">
               {error}
             </div>
           )}
 
-          <div className="text-6xl">🎵</div>
+          {/* Show icon only for audio or when video is not playing */}
+          {(mediaType === "audio" || (mediaType === "video" && !isPlaying)) && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-6xl">
+                {mediaType === "video" ? "🎬" : "🎵"}
+              </div>
+            </div>
+          )}
+
+          {/* Loading overlay */}
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg">
+              <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -7,7 +7,11 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import Navbar from "../../components/Navbar";
-import { useGetLaughData, useNFTMedia } from "../../hooks/useContract";
+import {
+  useGetLaughData,
+  useNFTMedia,
+  useGetOwner,
+} from "../../hooks/useContract";
 import { CONTRACT_ADDRESS } from "../../smart-contracts/constants";
 import abi from "../../smart-contracts/abi.json";
 import MediaPlayer from "../../components/MediaPlayer";
@@ -100,6 +104,7 @@ export default function NFTDetailPage({
   const { address, isConnected } = useAccount();
   const { data: laughData, isLoading, error, refetch } = useGetLaughData(id);
   const { mediaUrl, mediaType } = useNFTMedia(id);
+  const { data: currentOwner, isLoading: ownerLoading } = useGetOwner(id);
 
   const {
     writeContract: buyLaugh,
@@ -190,7 +195,10 @@ export default function NFTDetailPage({
   const [creator, title, , price, forSale] = Array.isArray(laughData)
     ? laughData
     : ["", "", "", 0, false];
-  const isOwner = address?.toLowerCase() === creator.toLowerCase();
+
+  // Check if current user is the owner (not creator)
+  const isOwner = address?.toLowerCase() === currentOwner?.toLowerCase();
+  const isCreator = address?.toLowerCase() === creator?.toLowerCase();
 
   return (
     <div className="min-h-screen bg-cream dark:bg-gray-900 transition-colors">
@@ -232,6 +240,43 @@ export default function NFTDetailPage({
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
                     Original Creator
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Current Owner Info */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3">
+                Current Owner
+              </h3>
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-green-500 dark:bg-green-600 rounded-full flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                </div>
+                <div>
+                  {ownerLoading ? (
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                      <div className="h-3 bg-gray-200 rounded w-16"></div>
+                    </div>
+                  ) : currentOwner ? (
+                    <>
+                      <p className="font-semibold text-gray-800 dark:text-white">
+                        {currentOwner.slice(0, 6)}...{currentOwner.slice(-4)}
+                      </p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        {isOwner ? "You" : "Current Owner"}
+                        {creator.toLowerCase() === currentOwner.toLowerCase() &&
+                          " (Original Creator)"}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-gray-500 dark:text-gray-400">
+                      Loading...
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
