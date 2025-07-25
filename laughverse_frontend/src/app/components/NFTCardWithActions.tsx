@@ -51,7 +51,10 @@ export default function NFTCardWithActions({
     : [undefined, undefined, undefined, undefined];
 
   // Check if current user is the owner (not creator)
-  const isOwner = address?.toLowerCase() === currentOwner?.toLowerCase();
+  const isOwner =
+    address && currentOwner && typeof currentOwner === "string"
+      ? address.toLowerCase() === currentOwner.toLowerCase()
+      : false;
 
   const handleQuickBuy = async (e: React.MouseEvent) => {
     e.preventDefault();

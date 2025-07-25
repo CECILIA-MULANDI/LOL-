@@ -95,8 +95,8 @@ export function useNFTMedia(tokenId: string) {
       try {
         setIsLoading(true);
 
-        if (!tokenURI) {
-          console.log("No tokenURI available yet");
+        if (!tokenURI || typeof tokenURI !== "string") {
+          console.log("No tokenURI available yet or invalid type");
           return;
         }
 
