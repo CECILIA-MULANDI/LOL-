@@ -39,3 +39,4 @@ export function Web3Provider({
     </WagmiProvider>
   );
 }
+// Auto-commit whitespace: 2025-07-25 23:31:11
