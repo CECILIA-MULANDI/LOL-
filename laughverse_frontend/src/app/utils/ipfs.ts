@@ -147,3 +147,5 @@ export const uploadMetadataToIPFS = async (
 // Auto-commit whitespace: 2025-07-25 23:42:29
 // Auto-commit whitespace: 2025-07-26 12:48:43
 // Auto-commit whitespace: 2025-07-26 12:54:53
+
+// Auto-commit spacing update: 2025-07-26 13:01:03
