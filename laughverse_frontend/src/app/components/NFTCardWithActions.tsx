@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   useAccount,
   useWriteContract,
@@ -29,7 +29,7 @@ export default function NFTCardWithActions({
     isLoading: mediaLoading,
     metadata,
   } = useNFTMedia(tokenId);
-  const { data: currentOwner } = useGetOwner(tokenId);
+  const { data: currentOwner, refetch: refetchOwner } = useGetOwner(tokenId);
 
   const { writeContract: listForSale, isPending: isListing } =
     useWriteContract();
@@ -47,6 +47,42 @@ export default function NFTCardWithActions({
   const [showListModal, setShowListModal] = useState(false);
   const [buyError, setBuyError] = useState("");
 
+  // Refetch when buy succeeds or any transaction completes
+  useEffect(() => {
+    if (buySuccess) {
+      // Add delay to ensure blockchain state is updated
+      setTimeout(() => {
+        refetch();
+        refetchOwner();
+      }, 2000);
+    }
+  }, [buySuccess, refetch, refetchOwner]);
+
+  // Also refetch when listing/removing from sale completes
+  useEffect(() => {
+    const refetchData = () => {
+      refetch();
+      refetchOwner();
+    };
+
+    // Refetch after any state change
+    if (!isListing && !isRemoving && !isBuying) {
+      refetchData();
+    }
+  }, [isListing, isRemoving, isBuying, refetch, refetchOwner]);
+
+  // Check if current user is the owner (not creator)
+  const isOwner = useMemo(() => {
+    if (
+      typeof address !== "string" ||
+      typeof currentOwner !== "string" ||
+      !address ||
+      !currentOwner
+    )
+      return false;
+    return address.toLowerCase() === currentOwner.toLowerCase();
+  }, [address, currentOwner]);
+
   if (isLoading || !laughData)
     return <div className="bg-white rounded-lg shadow-sm p-4">Loading...</div>;
 
@@ -54,12 +90,6 @@ export default function NFTCardWithActions({
   const [creator, title, price, forSale] = Array.isArray(laughData)
     ? [laughData[0], laughData[1], laughData[3], laughData[4]]
     : [undefined, undefined, undefined, undefined];
-
-  // Check if current user is the owner (not creator)
-  const isOwner =
-    address && currentOwner && typeof currentOwner === "string"
-      ? address.toLowerCase() === currentOwner.toLowerCase()
-      : false;
 
   const handleQuickBuy = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -114,11 +144,6 @@ export default function NFTCardWithActions({
       console.error("Remove from sale failed:", error);
     }
   };
-
-  // Refetch when buy succeeds
-  if (buySuccess) {
-    refetch();
-  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -253,19 +278,25 @@ export default function NFTCardWithActions({
 
         {buySuccess && <p className="text-xs text-green-600">🎉 Purchased!</p>}
 
-        {forSale && !isOwner && (
-          <button
-            onClick={handleQuickBuy}
-            disabled={isBuying || isBuyConfirming}
-            className="w-full px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 transition-colors text-sm"
-          >
-            {isBuying
-              ? "Buying..."
-              : isBuyConfirming
-              ? "Processing..."
-              : "Quick Buy"}
-          </button>
-        )}
+        {forSale &&
+          !isOwner &&
+          (() => {
+            let buttonText = "Quick Buy";
+            if (isBuying) {
+              buttonText = "Buying...";
+            } else if (isBuyConfirming) {
+              buttonText = "Processing...";
+            }
+            return (
+              <button
+                onClick={handleQuickBuy}
+                disabled={isBuying || isBuyConfirming}
+                className="w-full px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 disabled:opacity-50 transition-colors text-sm"
+              >
+                {buttonText}
+              </button>
+            );
+          })()}
 
         {isOwner && !forSale && (
           <button
