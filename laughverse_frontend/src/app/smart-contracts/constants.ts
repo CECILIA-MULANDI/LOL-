@@ -1,13 +1,28 @@
-// Auto-commit update: 2025-07-27 23:59:59
-// Auto-commit update: 2025-07-27 23:58:57
-// Auto-commit update: 2025-07-27 23:42:18
-// Auto-commit update: 2025-07-27 16:29:15
-// Auto-commit update: 2025-07-25 23:48:39
-// Auto-commit update: 2025-07-25 23:30:09
-// Auto-commit update: 2025-07-25 21:40:50
-// Auto-commit update: 2025-07-25 21:27:54
-// Auto-commit update: 2025-07-24 18:47:45
-export const CONTRACT_ADDRESS = "0x5f50935eA06250AF8a2a049913DbDFeB2F8629AE";
+// Network Configuration for Dual Deployment
+const NETWORK_CONFIG = {
+  testnet: {
+    contractAddress: "0x5f50935eA06250AF8a2a049913DbDFeB2F8629AE", // Base Sepolia
+    chainId: 84532,
+    networkName: "Base Sepolia Testnet",
+  },
+  mainnet: {
+    contractAddress: "YOUR_MAINNET_CONTRACT_ADDRESS", // Replace after deployment
+    chainId: 8453,
+    networkName: "Base Mainnet",
+  },
+};
+
+// Determine network based on branch or environment variable
+const isMainnetBranch =
+  process.env.VERCEL_GIT_COMMIT_REF === "mainnet" ||
+  process.env.NEXT_PUBLIC_NETWORK === "mainnet";
+
+const currentNetwork = isMainnetBranch ? "mainnet" : "testnet";
+
+export const CONTRACT_ADDRESS = NETWORK_CONFIG[currentNetwork].contractAddress;
+export const CHAIN_ID = NETWORK_CONFIG[currentNetwork].chainId;
+export const NETWORK_NAME = NETWORK_CONFIG[currentNetwork].networkName;
+export const CURRENT_NETWORK = currentNetwork;
 // Auto-commit whitespace: 2025-07-24 18:35:53
 // Auto-commit whitespace: 2025-07-24 18:41:31
 // Auto-commit whitespace: 2025-07-24 18:46:43
